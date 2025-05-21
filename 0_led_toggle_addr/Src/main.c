@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdint.h>
 
+#define __IO  volatile
+
 //Where is user led
 //PA5 ( from user manual)
 //port: A
@@ -59,23 +61,82 @@
 #define PIN5 (1U<<5)
 #define LED_USR PIN5
 
-//set mode of PA5 to output
-//|=(1U<<10)
-//&=~(1U<<11)
+typedef struct
+{
+	__IO uint32_t MODER;
+	__IO uint32_t OTYPER;
+	__IO uint32_t OSPEEDR;
+	__IO uint32_t PUPDR;
+	__IO uint32_t IDR;
+	__IO uint32_t ODR;
+	__IO uint32_t BSRR;
+	__IO uint32_t LCKR;
+	__IO uint32_t AFR[2];
+}GPIO_Typedef;
+
+typedef struct
+{
+	__IO uint32_t CR;
+	__IO uint32_t ICSCR;
+	__IO uint32_t CFGR;
+	__IO uint32_t PLLCFGR;
+	__IO uint32_t RES1[2];
+	__IO uint32_t CIER;
+	__IO uint32_t CIFR;
+	__IO uint32_t CICR;
+	__IO uint32_t RES2;
+	__IO uint32_t AHB1RSTR;
+	__IO uint32_t AHB2RSTR;
+	__IO uint32_t AHB3RSTR;
+	__IO uint32_t RES3;
+	__IO uint32_t APB1RSTR1;
+	__IO uint32_t APB1RSTR2;
+	__IO uint32_t APB2RSTR;
+	__IO uint32_t RES4;
+	__IO uint32_t AHB1ENR;
+	__IO uint32_t AHB2ENR;
+	__IO uint32_t AHB3ENR;
+	__IO uint32_t RES5;
+	__IO uint32_t APB1ENR1;
+	__IO uint32_t APB1ENR2;
+	__IO uint32_t APB2ENR;
+	__IO uint32_t RES6;
+	__IO uint32_t AHB1SMENR;
+	__IO uint32_t AHB2SMENR;
+	__IO uint32_t AHB3SMENR;
+	__IO uint32_t RES7;
+	__IO uint32_t APB1SMENR1;
+	__IO uint32_t APB1SMENR2;
+	__IO uint32_t APB2SMENR;
+	__IO uint32_t RES8;
+	__IO uint32_t CCIPR;
+	__IO uint32_t BDCR;
+	__IO uint32_t CSR;
+	__IO uint32_t CRRCR;
+	__IO uint32_t CCIPR2;
+}RCC_Typedef;
+
+
+#define GPIOA ((GPIO_Typedef*)GPIOA_BASE)
+#define RCC ((RCC_Typedef*)RCC_BASE)
 
 int main()
 {
 	//(1) Enable clock access to GPIOA
-	*RCC_AHB2EN_R |= GPIOAEN;
+	RCC->AHB2ENR |= GPIOAEN;
+
 	//(2) Set PA5 as output mode
-	*GPIOA_MODE_R |= (1U<<10);
-	*GPIOA_MODE_R &= ~(1U<<11);
+	GPIOA->MODER |= (1U<<10);
+	GPIOA->MODER &= ~(1U<<11);
+
+
+
 	//(3) forever loop
 	for(;;){
 		//(4) toggle output register
-		*GPIOA_OD_R ^= (LED_USR);
+		GPIOA->ODR ^= (LED_USR);
 		//(5) cause delay
-		for(int i = 0;i<1000000;++i){
+		for(int i = 0;i<500000;++i){
 
 		}
 	}
